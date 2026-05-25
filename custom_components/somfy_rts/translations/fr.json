@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Ajouter un volet Somfy RTS",
+        "description": "Entrez le nom du volet. Un identifiant RFX unique sera généré automatiquement.",
+        "data": {
+          "name": "Nom du volet"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Ce volet est déjà configuré"
+    }
+  }
+}

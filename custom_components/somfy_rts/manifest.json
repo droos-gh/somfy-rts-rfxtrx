@@ -1,0 +1,12 @@
+{
+  "domain": "somfy_rts",
+  "name": "Somfy RTS",
+  "version": "1.0.0",
+  "documentation": "https://github.com/droos-gh/somfy-rts-rfxtrx",
+  "issue_tracker": "https://github.com/droos-gh/somfy-rts-rfxtrx/issues",
+  "dependencies": ["rfxtrx"],
+  "codeowners": ["@droos-gh"],
+  "config_flow": true,
+  "iot_class": "assumed_state",
+  "requirements": []
+}

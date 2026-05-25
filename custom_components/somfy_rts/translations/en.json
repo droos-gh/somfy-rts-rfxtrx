@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Somfy RTS cover",
+        "description": "Enter the cover name. A unique RFX identifier will be generated automatically.",
+        "data": {
+          "name": "Cover name"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This cover is already configured"
+    }
+  }
+}
