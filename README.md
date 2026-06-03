@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="brand/logo.png" alt="Somfy RTS (RFXtrx)" width="420">
+</p>
+
 # Somfy RTS (RFXtrx) — intégration Home Assistant
 
 Intégration personnalisée pour piloter des volets / stores **Somfy RTS** depuis Home Assistant via un transmetteur **RFXtrx**.
@@ -40,6 +44,29 @@ Le volet répond ensuite aux commandes **Open / Close / Stop** et au bouton **My
 
 - Le protocole RTS est **unidirectionnel** : Home Assistant ne reçoit aucun retour d'état du moteur. L'état des entités `cover` est donc toujours *inconnu* (`assumed_state`).
 - Chaque entrée de configuration = un canal Somfy RTS distinct (`unit` fixé à `01`, `device_id` aléatoire et unique parmi les entrées existantes).
+
+## Logo / Marque
+
+Les visuels de l'intégration se trouvent dans [`brand/`](brand/) (sources SVG +
+PNG, voir [`brand/README.md`](brand/README.md)) :
+
+| Asset | Dimensions | Usage |
+|---|---|---|
+| `brand/icon.png` / `icon@2x.png` | 256² / 512² | Icône carrée |
+| `brand/logo.png` / `logo@2x.png` | 512×160 / 1024×320 | Logo paysage |
+
+Concept : volet roulant + ondes radio (pilotage par radio), palette bleu nuit
+`#1B2A4A` / cyan `#22D3EE`.
+
+Pour que Home Assistant affiche réellement l'icône/logo, déposer les PNG dans le
+dépôt [`home-assistant/brands`](https://github.com/home-assistant/brands) sous
+`custom_integrations/somfy_rts/` (via une PR). Sans cela, HA montre l'icône
+puzzle générique.
+
+> **Non-affiliation.** Cette intégration est un projet indépendant. Elle n'est ni
+> développée, ni soutenue, ni approuvée par Somfy. « Somfy » et « RTS » sont des
+> marques de leurs détenteurs respectifs ; elles ne sont utilisées ici qu'à titre
+> descriptif pour désigner le protocole radio piloté.
 
 ## Licence
 
