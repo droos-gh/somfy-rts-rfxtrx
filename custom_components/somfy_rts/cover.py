@@ -1,8 +1,13 @@
-from homeassistant.components.cover import CoverEntity, CoverEntityFeature
+from homeassistant.components.cover import (
+    STATE_CLOSED,
+    CoverEntity,
+    CoverEntityFeature,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN, CONF_DEVICE_ID, CONF_UNIT, CMD_STOP, CMD_UP, CMD_DOWN
 
@@ -21,10 +26,13 @@ async def async_setup_entry(
     async_add_entities([SomfyRtsCover(hass, entry, data)])
 
 
-class SomfyRtsCover(CoverEntity):
+class SomfyRtsCover(CoverEntity, RestoreEntity):
     _attr_has_entity_name = True
     _attr_name = None
-    _attr_is_closed = None  # RTS is one-way, state is always unknown
+    # RTS is one-way: there is no real feedback from the device, so we run in
+    # assumed_state mode. HA then shows separate open/stop/close buttons and we
+    # track the last command sent to display Open/Closed instead of "Unknown".
+    _attr_assumed_state = True
     _attr_supported_features = (
         CoverEntityFeature.OPEN | CoverEntityFeature.CLOSE | CoverEntityFeature.STOP
     )
@@ -32,6 +40,7 @@ class SomfyRtsCover(CoverEntity):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
         self.hass = hass
         self._data = data
+        self._attr_is_closed = False  # assume open on startup
         self._device_uid = f"{data[CONF_DEVICE_ID]}_{data[CONF_UNIT]}"
         self._attr_unique_id = self._device_uid
         self._attr_device_info = DeviceInfo(
@@ -41,15 +50,25 @@ class SomfyRtsCover(CoverEntity):
             model="RTS",
         )
 
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        last_state = await self.async_get_last_state()
+        if last_state is not None and last_state.state in (STATE_CLOSED, "open"):
+            self._attr_is_closed = last_state.state == STATE_CLOSED
+
     async def _send(self, cmd: int) -> None:
         packet = _build_rfy_packet(self._data[CONF_DEVICE_ID], self._data[CONF_UNIT], cmd)
         await self.hass.services.async_call("rfxtrx", "send", {"event": packet})
 
     async def async_open_cover(self, **kwargs) -> None:
         await self._send(CMD_UP)
+        self._attr_is_closed = False
+        self.async_write_ha_state()
 
     async def async_close_cover(self, **kwargs) -> None:
         await self._send(CMD_DOWN)
+        self._attr_is_closed = True
+        self.async_write_ha_state()
 
     async def async_stop_cover(self, **kwargs) -> None:
         await self._send(CMD_STOP)
