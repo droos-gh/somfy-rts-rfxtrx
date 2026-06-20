@@ -1,0 +1,55 @@
+name: Release
+
+# Publie automatiquement une release GitHub lorsque la version declaree dans
+# le manifest.json change sur la branche main. HACS detecte alors la mise a jour.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - custom_components/somfy_rts/manifest.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lire la version du manifest
+        id: version
+        run: |
+          version=$(jq -r '.version' custom_components/somfy_rts/manifest.json)
+          if [ -z "$version" ] || [ "$version" = "null" ]; then
+            echo "Aucune version trouvee dans le manifest." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verifier si la release existe deja
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "La release ${{ steps.version.outputs.tag }} existe deja, rien a faire."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Creer la release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --target "${{ github.sha }}" \
+            --title "${{ steps.version.outputs.tag }}" \
+            --generate-notes
