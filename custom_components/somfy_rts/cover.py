@@ -1,8 +1,4 @@
-from homeassistant.components.cover import (
-    STATE_CLOSED,
-    CoverEntity,
-    CoverEntityFeature,
-)
+from homeassistant.components.cover import CoverEntity, CoverEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -53,8 +49,8 @@ class SomfyRtsCover(CoverEntity, RestoreEntity):
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
         last_state = await self.async_get_last_state()
-        if last_state is not None and last_state.state in (STATE_CLOSED, "open"):
-            self._attr_is_closed = last_state.state == STATE_CLOSED
+        if last_state is not None and last_state.state in ("closed", "open"):
+            self._attr_is_closed = last_state.state == "closed"
 
     async def _send(self, cmd: int) -> None:
         packet = _build_rfy_packet(self._data[CONF_DEVICE_ID], self._data[CONF_UNIT], cmd)

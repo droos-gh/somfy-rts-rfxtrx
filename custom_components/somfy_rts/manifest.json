@@ -1,7 +1,7 @@
 {
   "domain": "somfy_rts",
   "name": "Somfy RTS",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "documentation": "https://github.com/droos-gh/somfy-rts-rfxtrx",
   "issue_tracker": "https://github.com/droos-gh/somfy-rts-rfxtrx/issues",
   "dependencies": ["rfxtrx"],
